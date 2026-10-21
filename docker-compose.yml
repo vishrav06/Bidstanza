@@ -1,0 +1,27 @@
+# Local PostgreSQL for Bidstanza.
+# Runs a single postgres:17 container with a named volume so data survives restarts.
+# On first boot (empty volume) the init script in ./docker creates the separate
+# `bidstanza_test` database used by pytest, so tests never touch dev data.
+# Start: `docker compose up -d`   Reset everything: `docker compose down -v`
+
+services:
+  db:
+    image: postgres:17
+    container_name: bidstanza-db
+    environment:
+      POSTGRES_USER: bidstanza
+      POSTGRES_PASSWORD: bidstanza
+      POSTGRES_DB: bidstanza
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/init-test-db.sql:/docker-entrypoint-initdb.d/init-test-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bidstanza -d bidstanza"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:
