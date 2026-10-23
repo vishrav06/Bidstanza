@@ -111,7 +111,7 @@ class SellerCannotBid(Forbidden):
 
 
 class BidTooLow(AppError):
-    status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+    status_code = status.HTTP_422_UNPROCESSABLE_CONTENT
     code = "bid_too_low"
     message = "Bid is below the minimum required amount."
 
@@ -153,7 +153,7 @@ async def validation_error_handler(_: Request, exc: RequestValidationError) -> J
         for err in exc.errors()
     ]
     return error_response(
-        status.HTTP_422_UNPROCESSABLE_ENTITY,
+        status.HTTP_422_UNPROCESSABLE_CONTENT,
         "validation_error",
         "Request validation failed.",
         {"errors": errors},
